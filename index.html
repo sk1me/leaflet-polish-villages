@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>GeoJSON tutorial - Leaflet</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            width: 500px;
+            height: 450px;
+        }
+
+        /*Legend specific*/
+        .legend {
+            padding: 6px 8px;
+            font: 14px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+            /*border-radius: 5px;*/
+            line-height: 24px;
+            color: #555;
+        }
+
+        .legend h4 {
+            text-align: center;
+            font-size: 16px;
+            margin: 2px 12px 8px;
+            color: #777;
+        }
+
+        .legend span {
+            position: relative;
+            bottom: 3px;
+        }
+
+        .legend i {
+            width: 4px;
+            height: 4px;
+            float: left;
+            margin: 6px 6px 0px 0;
+            opacity: 0.7;
+            border-radius: 50%;
+            border-width: 1px;
+            border-style: solid;
+            border-color: #777;
+        }
+
+        .legend i.icon {
+            background-size: 18px;
+            background-color: rgba(255, 255, 255, 1);
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div id='map'></div>
+
+    <script>
+        var map = L.map('map').setView([52.0, 19.2], 6);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox/light-v9',
+            tileSize: 512,
+            zoomOffset: -1
+        }).addTo(map);
+
+        var baseballIcon = L.icon({
+            iconUrl: 'baseball-marker.png',
+            iconSize: [32, 37],
+            iconAnchor: [16, 37],
+            popupAnchor: [0, -28]
+        });
+
+        function customTip() {
+            this.unbindTooltip();
+            if (!this.isPopupOpen()) this.bindTooltip('Short description').openTooltip();
+        }
+
+        function customPop() {
+            this.unbindTooltip();
+        }
+
+
+        var geojsonStaraWies = new L.GeoJSON.AJAX("starawies.geojson", {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 2,
+                    fillColor: "#e76f51",
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 0.2,
+                    fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                    'Województwo: ' + feature.properties.woj + '<br />' +
+                    'Powiat: ' + feature.properties.powiat + '<br />' +
+                    'Gmina: ' + feature.properties.gmina);
+                layer.on('mouseover', customPop);
+                layer.on('click', customPop);
+            }
+        });
+        geojsonStaraWies.addTo(map);
+
+        var geojsonNowaWies = new L.GeoJSON.AJAX("nowawies.geojson", {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 2,
+                    fillColor: "#2a9d8f",
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 0.2,
+                    fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                    'Województwo: ' + feature.properties.woj + '<br />' +
+                    'Powiat: ' + feature.properties.powiat + '<br />' +
+                    'Gmina: ' + feature.properties.gmina);
+            }
+        });
+        geojsonNowaWies.addTo(map);
+
+
+
+        /*Legend specific*/
+        var legend = L.control({ position: "bottomleft" });
+
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create("div", "legend");
+            div.innerHTML += "<h4>Villages</h4>";
+            div.innerHTML += '<i style="background: #e76f51"></i><span>Stara Wieś</span><br>';
+            div.innerHTML += '<i style="background: #2a9d8f"></i><span>Nowa Wieś</span><br>';
+            return div;
+        };
+        legend.addTo(map);
+    </script>
+
+
+
+</body>
+
+</html>
