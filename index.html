@@ -32,6 +32,12 @@
             height: 450px;
         }
 
+        #map2 {
+            width: 500px;
+            height: 450px;
+            margin: 0px 500px 0 0;
+        }
+
         /*Legend specific*/
         .legend {
             padding: 6px 8px;
@@ -80,16 +86,14 @@
 <body>
 
     <div id='map'></div>
+    <div id='map2'></div>
 
     <script>
         var map = L.map('map').setView([52.0, 19.2], 6);
 
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        L.tileLayer('https://api.maptiler.com/maps/outdoor/{z}/{x}/{y}@2x.png?key=113Oyr9g8Y8LIP2FV5zF', {
             maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox/light-v9',
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
             tileSize: 512,
             zoomOffset: -1
         }).addTo(map);
@@ -100,15 +104,6 @@
             iconAnchor: [16, 37],
             popupAnchor: [0, -28]
         });
-
-        function customTip() {
-            this.unbindTooltip();
-            if (!this.isPopupOpen()) this.bindTooltip('Short description').openTooltip();
-        }
-
-        function customPop() {
-            this.unbindTooltip();
-        }
 
 
         var geojsonStaraWies = new L.GeoJSON.AJAX("starawies.geojson", {
@@ -123,11 +118,23 @@
                 });
             },
             onEachFeature: function (feature, layer) {
+                function customTip() {
+                    this.unbindTooltip();
+                    if (!this.isPopupOpen()) this.bindTooltip('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                        'Województwo: ' + feature.properties.woj + '<br />' +
+                        'Powiat: ' + feature.properties.powiat + '<br />' +
+                        'Gmina: ' + feature.properties.gmina).openTooltip();
+                }
+
+                function customPop() {
+                    this.unbindTooltip();
+                }
+
                 layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
                     'Województwo: ' + feature.properties.woj + '<br />' +
                     'Powiat: ' + feature.properties.powiat + '<br />' +
                     'Gmina: ' + feature.properties.gmina);
-                layer.on('mouseover', customPop);
+                layer.on('mouseover', customTip);
                 layer.on('click', customPop);
             }
         });
@@ -145,15 +152,27 @@
                 });
             },
             onEachFeature: function (feature, layer) {
+                function customTip() {
+                    this.unbindTooltip();
+                    if (!this.isPopupOpen()) this.bindTooltip('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                        'Województwo: ' + feature.properties.woj + '<br />' +
+                        'Powiat: ' + feature.properties.powiat + '<br />' +
+                        'Gmina: ' + feature.properties.gmina).openTooltip();
+                }
+
+                function customPop() {
+                    this.unbindTooltip();
+                }
+
                 layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
                     'Województwo: ' + feature.properties.woj + '<br />' +
                     'Powiat: ' + feature.properties.powiat + '<br />' +
                     'Gmina: ' + feature.properties.gmina);
+                layer.on('mouseover', customTip);
+                layer.on('click', customPop);
             }
         });
         geojsonNowaWies.addTo(map);
-
-
 
         /*Legend specific*/
         var legend = L.control({ position: "bottomleft" });
@@ -166,6 +185,113 @@
             return div;
         };
         legend.addTo(map);
+
+
+
+
+
+
+
+
+
+
+
+        var map2 = L.map('map2').setView([52.0, 19.2], 6);
+
+        L.tileLayer('https://api.maptiler.com/maps/outdoor/{z}/{x}/{y}@2x.png?key=113Oyr9g8Y8LIP2FV5zF', {
+            maxZoom: 18,
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+            tileSize: 512,
+            zoomOffset: -1
+        }).addTo(map2);
+
+        var baseballIcon = L.icon({
+            iconUrl: 'baseball-marker.png',
+            iconSize: [32, 37],
+            iconAnchor: [16, 37],
+            popupAnchor: [0, -28]
+        });
+
+
+        var geojsonStaraWies = new L.GeoJSON.AJAX("starawies.geojson", {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 2,
+                    fillColor: "#e76f51",
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 0.2,
+                    fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                function customTip() {
+                    this.unbindTooltip();
+                    if (!this.isPopupOpen()) this.bindTooltip('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                        'Województwo: ' + feature.properties.woj + '<br />' +
+                        'Powiat: ' + feature.properties.powiat + '<br />' +
+                        'Gmina: ' + feature.properties.gmina).openTooltip();
+                }
+
+                function customPop() {
+                    this.unbindTooltip();
+                }
+
+                layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                    'Województwo: ' + feature.properties.woj + '<br />' +
+                    'Powiat: ' + feature.properties.powiat + '<br />' +
+                    'Gmina: ' + feature.properties.gmina);
+                layer.on('mouseover', customTip);
+                layer.on('click', customPop);
+            }
+        });
+        geojsonStaraWies.addTo(map2);
+
+        var geojsonNowaWies = new L.GeoJSON.AJAX("nowawies.geojson", {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 2,
+                    fillColor: "#2a9d8f",
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 0.2,
+                    fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                function customTip() {
+                    this.unbindTooltip();
+                    if (!this.isPopupOpen()) this.bindTooltip('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                        'Województwo: ' + feature.properties.woj + '<br />' +
+                        'Powiat: ' + feature.properties.powiat + '<br />' +
+                        'Gmina: ' + feature.properties.gmina).openTooltip();
+                }
+
+                function customPop() {
+                    this.unbindTooltip();
+                }
+
+                layer.bindPopup('<b>' + feature.properties.naz_glowna + '</b><br />' +
+                    'Województwo: ' + feature.properties.woj + '<br />' +
+                    'Powiat: ' + feature.properties.powiat + '<br />' +
+                    'Gmina: ' + feature.properties.gmina);
+                layer.on('mouseover', customTip);
+                layer.on('click', customPop);
+            }
+        });
+        geojsonNowaWies.addTo(map2);
+
+        /*Legend specific*/
+        var legend = L.control({ position: "bottomleft" });
+
+        legend.onAdd = function (map2) {
+            var div = L.DomUtil.create("div", "legend");
+            div.innerHTML += "<h4>Villages</h4>";
+            div.innerHTML += '<i style="background: #e76f51"></i><span>Stara Wieś</span><br>';
+            div.innerHTML += '<i style="background: #2a9d8f"></i><span>Nowa Wieś</span><br>';
+            return div;
+        };
+        legend.addTo(map2);
     </script>
 
 
